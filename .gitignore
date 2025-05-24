@@ -11,10 +11,6 @@ CASIA2.zip
 __pycache__/
 *.pyc
 
-# Ignore model checkpoints
-*.h5
-*.ckpt
-
 # Ignore virtual environments
 venv/
 .env/
