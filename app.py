@@ -9,7 +9,10 @@ app = Flask(__name__)
 
 # Load the trained model
 MODEL_PATH = "models/trained_model.h5"
-model = load_model(MODEL_PATH)
+if os.path.exists(MODEL_PATH):
+    model = load_model(MODEL_PATH)
+else:
+    raise FileNotFoundError(f"Model not found at {MODEL_PATH}")
 
 # Load accuracy JSON
 ACCURACY_JSON_PATH = "models/accuracy.json"
@@ -54,7 +57,7 @@ def apply_ela(image_path, quality=90):
     scale = 255.0 / max_diff
     diff = ImageEnhance.Brightness(diff).enhance(scale)
     
-    # Save ELA image (overwrite previous file)
+    # Save ELA image
     diff.save(ELA_IMAGE_PATH)
 
     return np.array(diff.resize(IMG_SIZE))
@@ -84,7 +87,7 @@ def upload_and_predict():
     if file.filename == "":
         return jsonify({"error": "No selected file"}), 400
 
-    # Save the uploaded file (overwrite previous)
+    # Save the uploaded file
     file.save(UPLOAD_IMAGE_PATH)
 
     # Run prediction
@@ -101,4 +104,6 @@ def upload_and_predict():
 
 # Run Flask App
 if __name__ == "__main__":
-    app.run(debug=False)
+    # Use Render-compatible host and port
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
